@@ -413,16 +413,16 @@ def main():
         x.ip_sniff(args.ip_sniff)
     elif args.ttl != None:
         x.ttl(args.ttl)
-    elif args.rr != None:
-        x.rrecord(args.rr)
-    elif args.l != None:
-        x.acount(args.l)
-    elif args.c != None:
-        x.count(args.c)
-    elif args.ipf != None:
-        x.ip_flux(args.ipf)
-    elif args.ipr != None:
-        x.ip_reverse(args.ipr)
+    elif args.rrecord != None:
+        x.rrecord(args.rrecord)
+    elif args.local != None:
+        x.acount(args.local)
+    elif args.count != None:
+        x.count(args.count)
+    elif args.ip_flux != None:
+        x.ip_flux(args.ip_flux)
+    elif args.ip_reverse != None:
+        x.ip_reverse(args.ip_reverse)
     else:
         x.help()
     sys.exit(-1)
