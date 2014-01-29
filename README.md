@@ -18,6 +18,7 @@ wireshark full install http://www.wireshark.org/
 
 
 GETTING STARTED
+---------------
 
 This version has two simple python scripts to support the collection of DNS traffic as pdns2_collect.py and the other to query as pdns2_query.py
 
@@ -47,6 +48,7 @@ www.youtube.com                          173.194.37.4    20120524  20120524  CNA
 
 
 AUTHOR
+------
 
 pDNS is developed and maintained 
 terraplex at gmail.com
