@@ -78,7 +78,7 @@ def main():
 
     tshark = subprocess.Popen(command,stdout=subprocess.PIPE,shell=True)    
 
-    r = redis.StrictRedis(host='localhost', port=6379, db=0)
+    r = redis.StrictRedis(host='localhost', port=6379, db=2)
     r.ping
     while True:
         tshark.poll()                  
