@@ -175,8 +175,6 @@ class pdns():
     pass a string in single quotes '''
     def domain(self, domain):
         domain_list = r.keys('Domain:'+domain)
-        tdom_list = r.keys('TDOM:'+domain)
-        domain_list.extend(tdom_list)
         worklist = key_stripper(domain_list)
         worklist1 = Domain_sort(worklist)
         print header_dom()
@@ -185,9 +183,7 @@ class pdns():
 
     def ip(self, ip):
         ''' query by ip address '''
-        ip_list = r.keys('IP:'+ip)
-        tip_list = r.keys('TIP:'+ip)
-        ip_list.extend(tip_list)                       
+        ip_list = r.keys('IP:'+str(ip))                     
         worklist = key_stripper(ip_list)               
         worklist.sort()                                
         print header_ip()                              
@@ -198,13 +194,13 @@ class pdns():
         '''query by date in format ('20130101')'''
         match_hold = []
         domain_list = r.keys("Domain:*")
+        print domain_list
         for sublist in domain_list:
             datecheck = r.hget(sublist, 'date')
             if datecheck != None:
                 if datecheck[:8] == date:
                     match_hold.append(sublist)
         match_hold1 = key_stripper(match_hold)
-        print 'made it here'
         match_hold2 = Domain_sort(match_hold1)
         print header_dom()
         for each in match_hold2:
@@ -389,16 +385,16 @@ def main():
     parser = argparse.ArgumentParser(description='pDNS2 a tool to collect and store DNS request and responses. Requires Redis server running on default port.')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-d','--domain')#, nargs=1
-    group.add_argument('-i','--ip', nargs=1)
-    parser.add_argument('-da','--date')
+    group.add_argument('-i','--ip')
+    parser.add_argument('-date','--date')
     parser.add_argument('-ips','--ip_sniff')
     parser.add_argument('-ttl','--ttl')
     parser.add_argument('-rr','--rrecord')
-    parser.add_argument('-l','--local')
+    parser.add_argument('-l','--local', action='store_true')
     parser.add_argument('-ac','--acount')
     parser.add_argument('-c','--count')
     parser.add_argument('-ipf','--ip_flux')
-    parser.add_argument('-ipr','--ip_reverse')
+    parser.add_argument('-ipr','--ip_reverse', nargs=2)
     #group.add_argument('-v', '--verbose', action='store_true')
     args = parser.parse_args()
 
@@ -422,7 +418,7 @@ def main():
     elif args.ip_flux != None:
         x.ip_flux(args.ip_flux)
     elif args.ip_reverse != None:
-        x.ip_reverse(args.ip_reverse)
+        x.ip_reverse(args.ip_reverse[0],args.ip_reverse[1])
     else:
         x.help()
     sys.exit(-1)
