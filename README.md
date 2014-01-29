@@ -96,3 +96,7 @@ pDNS is developed and maintained
 terraplex at gmail.com
 
 
+Errata
+------
+
+This is the basic version, if interested in the more advanced versions or specialized versions that work with scapy, let me know.
