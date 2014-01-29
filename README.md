@@ -11,7 +11,9 @@ REQUIREMENTS
 ------------
 
 Redis http://redis.io/
+
 Redis API https://github.com/andymccurdy/redis-py
+
 wireshark full install http://www.wireshark.org/
 
 
