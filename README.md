@@ -32,19 +32,18 @@ below are are simply using a wildcard with -d for any domain
 Sample query
 python pdns2_query.py -d *
 
--d *
-Domain                                   ips             first     date      rr    ttl   count    
-None
-w2.eff.org                               69.50.232.52    20120524  20120524  CNAME 300   3        
-web5.eff.org                             69.50.232.52    20120524  20120524  A     300   3        
-slashdot.org                             216.34.181.45   20120524  20120524  A     2278  1        
-csi.gstatic.com                          74.125.143.120  20120524  20120524  A     300   1        
-ssl.gstatic.com                          74.125.229.175  20120524  20120524  A     244   1        
-xkcd.com                                 107.6.106.82    20120524  20120524  A     600   1        
-imgs.xkcd.com                            69.9.191.19     20120524  20120524  CNAME 418   1        
-www.xkcd.com                             107.6.106.82    20120524  20120524  CNAME 600   1        
-craphound.com                            204.11.50.137   20120524  20120524  A     861   1        
-www.youtube.com                          173.194.37.4    20120524  20120524  CNAME 81588 1        
+
+  Domain                                   ips             first     date      rr    ttl   count    
+  w2.eff.org                               69.50.232.52    20120524  20120524  CNAME 300   3        
+  web5.eff.org                             69.50.232.52    20120524  20120524  A     300   3        
+  slashdot.org                             216.34.181.45   20120524  20120524  A     2278  1        
+  csi.gstatic.com                          74.125.143.120  20120524  20120524  A     300   1        
+  ssl.gstatic.com                          74.125.229.175  20120524  20120524  A     244   1        
+  xkcd.com                                 107.6.106.82    20120524  20120524  A     600   1        
+  imgs.xkcd.com                            69.9.191.19     20120524  20120524  CNAME 418   1        
+  www.xkcd.com                             107.6.106.82    20120524  20120524  CNAME 600   1        
+  craphound.com                            204.11.50.137   20120524  20120524  A     861   1        
+  www.youtube.com                          173.194.37.4    20120524  20120524  CNAME 81588 1        
 
 
 AUTHOR
