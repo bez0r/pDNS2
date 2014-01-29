@@ -8,6 +8,7 @@ pDNS2 is based on Florian Weimer’s original dnslogger with improved features f
 
 
 REQUIREMENTS
+------------
 
 Redis http://redis.io/
 Redis API https://github.com/andymccurdy/redis-py
