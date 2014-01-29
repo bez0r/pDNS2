@@ -49,6 +49,46 @@ python pdns2_query.py -d *
   www.youtube.com                          173.194.37.4    20120524  20120524  CNAME 81588 1        
 ```
 
+pDNS2 commands
+--------------
+
+DOMAIN EXAMPLES
+
+```
+arguments:
+  -h, --help            show this help message and exit
+  -d DOMAIN, --domain DOMAIN
+  -i IP, --ip IP
+  -da DATE, --date DATE
+  -ips IP_SNIFF, --ip_sniff IP_SNIFF
+  -ttl TTL, --ttl TTL
+  -rr RRECORD, --rrecord RRECORD
+  -l LOCAL, --local LOCAL
+  -ac ACOUNT, --acount ACOUNT
+  -c COUNT, --count COUNT
+  -ipf IP_FLUX, --ip_flux IP_FLUX
+  -ipr IP_REVERSE, --ip_reverse IP_REVERSE
+
+
+-d *example.com     seeks all domains that end with example.com
+-i 1.1.1.1          ip address search
+-ttl 0              use a number like 0 or 100 to get all the TTL of a specific value search is based on domain not IP
+-ac  *example.com            return by query, counts of counts (usage), or 'hits' for the domains in order, *.google.com or *.com are examples 
+
+-l               search entire database local resolved IP addresses that resolve to 127.0.0.1 etc. 
+-ipf *.com       return a COUNT of domains in the IP space for each instance of a domain, use with ip_reverse
+-ipr * seattletimes.com use with ip_flux, enumerate domains in the IP space
+
+-ips 192.168.1.1'    search the domain space for a specific IP address, different then searching by IP 
+-da 20130101          return all records by date
+
+ADMINISTRATIVE
+delete_key('Domain:*delete*') Dangerous command, deletes a key, must use the entire key such as Domain: or IP:
+raw_record('Domain:xalrbngb-0.t.nessus.org') view the raw record properties (no wildcards) use full key name
+pDNS2 tracks current state and last known, it is a snapshot of organization perception, not a log.
+
+```
+
 AUTHOR
 ------
 
