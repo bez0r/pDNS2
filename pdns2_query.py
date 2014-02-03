@@ -14,43 +14,29 @@ import redis
 
 
 
+# http://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml
+# http://en.wikipedia.org/wiki/List_of_DNS_record_types
+RRECORD_TO_RRTYPE = {
+    '0x0001': 'A', # a host address
+    '0x0002': 'NS', # a name server
+    '0x0005': 'CNAME', # cononical name
+    '0x000f': 'MX', # mail exchange, should only work with a mail exchange, isolate this type of DNS from host
+    '0x0006': 'SOA', # start of a zone authority
+    '0x000c': 'PTR', # name pointer
+    '0x0010': 'TXT', # watch this one, because it supports 189 bytes per record, sometime an exfil channel
+    '0x001c': 'AAAA', # ipv6
+    '0x0029': 'OPT', # optional (used with DNSSEC)
+    '0x002e': 'RRSIG', # resource register digital signature
+    '0x0021': 'SRV', # server selection
+    '0x002f': 'NSEC', # authenticated denial of existence
+    '0x0032': 'NSEC3', # authenticated denial of existenc v3?
+    '0x002b': 'DS', # delegation signer
+    '0x00fa': 'TSIG', # transaction security mechanisms
+}
+
 def record_translate(rrecord):
     '''Resolves records by type'''
-    # http://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml
-    # http://en.wikipedia.org/wiki/List_of_DNS_record_types
-    if rrecord == '0x0001':
-        rrtype = "A"    # a host address
-    elif rrecord == '0x0002':
-        rrtype = "NS"   # a name server
-    elif rrecord == '0x0005':
-        rrtype = "CNAME"    # cononical name
-    elif rrecord == '0x000f': #MX carries a  higher risk
-        rrtype = 'MX'       # mail exchange, should only work with a mail exchange, isolate this type of DNS from host
-    elif rrecord == '0x0006':
-        rrtype = 'SOA'  # start of a zone authority
-    elif rrecord == '0x000c':
-        rrtype = "PTR"  # name pointer
-    elif rrecord == '0x0010':
-        rrtype = "TXT"   # watch this one, because it supports 189 bytes per record, sometime an exfil channel
-    elif rrecord == '0x001c':
-        rrtype = "AAAA" # ipv6
-    elif rrecord == '0x0029':
-        rrtype = "OPT"      # optional (used with DNSSEC)
-    elif rrecord == '0x002e':
-        rrtype = 'RRSIG'    # resource register digital signature
-    elif rrecord == '0x0021':
-        rrtype = 'SRV'      # server selection
-    elif rrecord == '0x002f':
-        rrtype = 'NSEC'     # authenticated denial of existence
-    elif rrecord == '0x0032':
-        rrtype = 'NSEC3'    # authenticated denial of existenc v3?
-    elif rrecord == '0x002b':
-        rrtype = 'DS'       # delegation signer
-    elif rrecord == '0x00fa':
-        rrtype = 'TSIG'     # transaction security mechanisms 
-    else:   # Encountered a RR type we weren't prepared for
-        rrtype = 'unknown' # unknown record types could carry a risk
-    return(rrtype)
+    return RRECORD_TO_RRTYPE.get(rrecord, 'unknown')
 
 
 
