@@ -34,12 +34,11 @@ parser.add_argument('-i','--interface',help='specify the interface name')
 args = parser.parse_args()
 
 if args.file:
-    a=rdpcap(args.file)
+    a=rdpcap(str(args.file))
 elif args.interface:
     print 'you might run into issues using scapy with pcapy'
     print 'visit http://stackoverflow.com/questions/17314510/how-to-fix-scapy-warning-pcapy-api-does-not-permit-to-get-capure-file-descripto'
     a = sniff(iface=args.interface, filter="udp and port 53")#prn=print_summary)
-
 else:
     print parser.description
     print 'you must supply either an interface with -i with the correct interface or -f with the path to the pcap file'
@@ -53,6 +52,7 @@ def value_sniper(arg1):
     snap_off = string_it.split('=')
     working_value = snap_off [1]
     return working_value[1:-1]
+
 
 def normalizeDate(date):
     #unfortunate but wireshark/tshark does not offer time in unix format
@@ -82,10 +82,13 @@ def normalizeDate(date):
 
 def fix_type(arg1):
     ''' add 0x000 to the argument '''
+    if arg1 >= 16:
+        return "0x00%0X" % arg1
+    else:
+        return "0x000%0X" % arg1
     # single digits should look like 0x000
     # double digits should look like 0x00
     # This is about being consistent across versions
-    return "0x000%0X" % arg1
 
 
 '''open a connection to the local redis database and assign to r'''
@@ -96,9 +99,11 @@ r = redis.StrictRedis(host='localhost', port=6379, db=2)
 
 for pkt in a: # read the packet   
     if pkt.haslayer(DNSRR): ## Read in a pcap and parse out the DNSRR Layer
-        domain = pkt[DNSRR].rrname   # this is the response, it is assumed
+        domain1 = pkt[DNSRR].rrname   # this is the response, it is assumed
         
-        if domain != '': # ignore empty and failures
+        if domain1 != '': # ignore empty and failures
+            domain = domain1[:-1]
+
             pkt_type = pkt[DNSRR].type  # identify the response record that requires parsing
             rrtype = fix_type(pkt_type)
 
@@ -119,12 +124,12 @@ for pkt in a: # read the packet
             r.hincrby("Domain:"+str(domain), "count", amount=1)    # dns.resp.addr COUNT increment
 
 
-            if pkt_type == 5 or pkt_type == 2:  # this should work for type 5 and 2
+            if pkt_type == 2 or pkt_type == 5:  # this should work for type 5 and 2
                 x = pkt[DNSRR].answers
                 dns_strings = str(x)
                 fields = dns_strings.split('|')
                 for each in fields:
-                    if 'type=A' or 'type=NS' in each:
+                    if 'type=NS' or 'type=A' in each:
                         subeach = str(each)
                         y = subeach.split(' ') # split lines
                         for subsubeach in y:
@@ -133,25 +138,38 @@ for pkt in a: # read the packet
                                 domain_hold = hold[:-1]
                             if 'rdata' in subsubeach:
                                 ipaddress = value_sniper(subsubeach)
-                                #print domain_hold,ipaddress
-                                r.hset("IP:"+str(ipaddress),"type", rrtype)                   # dns.resp.type    
-                                r.hset("IP:"+str(ipaddress),"ttl",ttls)                         # dns.resp.ttl
-                                r.hset("IP:"+str(ipaddress), "date",str(pkt_date))              # frame.time
-                                r.hsetnx("IP:"+str(ipaddress), "first",str(pkt_date))		# set first seen
-                                r.hset("IP:"+str(ipaddress), "name", domain_hold)                    # dns.resp.name
-                                r.hincrby("IP:"+str(ipaddress), "count", amount=1)              # dns.resp.add COUNT increment
-            else:
-            #if pkt_type == 1 or pkt_type == 12 or pkt_type == 28: #  32bit IP addresses 
+                                if ipaddress[-1:] != '.' and ipaddress[0] != '\\':                                
+                                    r.hset("IP:"+str(ipaddress),"type", rrtype)                   # dns.resp.type    
+                                    r.hset("IP:"+str(ipaddress),"ttl",ttls)                         # dns.resp.ttl
+                                    r.hset("IP:"+str(ipaddress), "date",str(pkt_date))              # frame.time
+                                    r.hsetnx("IP:"+str(ipaddress), "first",str(pkt_date))		# set first seen
+                                    r.hset("IP:"+str(ipaddress), "name", domain_hold)                    # dns.resp.name
+                                    r.hincrby("IP:"+str(ipaddress), "count", amount=1)              # dns.resp.add COUNT increment
+                                if ipaddress != None:
+                                    r.hset("Domain:"+str(domain), "ip", ipaddress)
+
+            
+            elif pkt_type == 1 or pkt_type == 12 or pkt_type == 28: #  32bit IP addresses
                 ipaddress = pkt[DNSRR].rdata
                 r.hset("Domain:"+str(domain),"ip",ipaddress)                         # dns.resp.addr
-                r.hset("IP:"+str(ipaddress),"type", rrtype)                   # dns.resp.type    
+                r.hset("IP:"+str(ipaddress),"type", rrtype)                   # dns.resp.type
+
                 r.hset("IP:"+str(ipaddress),"ttl",ttls)                         # dns.resp.ttl
                 r.hset("IP:"+str(ipaddress), "date",str(pkt_date))              # frame.time
                 r.hsetnx("IP:"+str(ipaddress), "first",str(pkt_date))		# set first seen
                 r.hset("IP:"+str(ipaddress), "name", domain)                    # dns.resp.name
                 r.hincrby("IP:"+str(ipaddress), "count", amount=1)              # dns.resp.add COUNT increment
+
+            else:
+                #pkt_type == 12: #ptr, just grab the domain, count and skip IP
+                #print domain,pkt_type
+                r.hset("Domain:"+str(domain), "ip", None)
+
+
     
 print 'completed'
+
+
 
 
 
