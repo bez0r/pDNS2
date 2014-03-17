@@ -68,7 +68,7 @@ def main():
     args = parser.parse_args()
 
     if args.file:
-	command = "/usr/bin/tshark -nnr "+str(args.file)+" -T fields -R \"dns.count.answers gt 0\" -e frame.time -e ip.src -e ip.dst -e dns.resp.type -e dns.resp.name -e dns.resp.ttl -e dns.resp.primaryname -e dns.resp.ns -e dns.resp.addr -E separator=\"|\"  2> /dev/null"
+	command = "/usr/bin/tshark -nnr "+str(args.file)+" -T fields -Y \"dns.count.answers gt 0\" -e frame.time -e ip.src -e ip.dst -e dns.resp.type -e dns.resp.name -e dns.resp.ttl -e dns.resp.primaryname -e dns.resp.ns -e dns.resp.addr -E separator=\"|\" "
     elif args.interface:
 	command = "/usr/bin/tshark -nni "+str(args.interface)+" -T fields -R \"dns.count.answers gt 0\" -e frame.time -e ip.src -e ip.dst -e dns.resp.type -e dns.resp.name -e dns.resp.ttl -e dns.resp.primaryname -e dns.resp.ns -e dns.resp.addr -E separator=\"|\"  2> /dev/null"
     else:
@@ -78,16 +78,21 @@ def main():
 
     tshark = subprocess.Popen(command,stdout=subprocess.PIPE,shell=True)    
 
-    r = redis.StrictRedis(host='localhost', port=6379, db=2)
-    r.ping
+    r = redis.StrictRedis(host='localhost', port=6379, db=0)
+
     while True:
+	testcondition = False
         tshark.poll()                  
-        line = tshark.stdout.readline() 
-        if (line==''):
+        line = tshark.stdout.readline()
+	#print line
+	if (line==''):
+        	testcondition = True
+		pass
+        if (line=='') and testcondition == True:
             print "End of line",line
             sys.exit(1)
         else: 
-            line = line[:-1]  
+            line = line[:-1]
             fields = line.split('|')     
             strdate = fields[0][:-10]
             dns_server = fields[1]            
